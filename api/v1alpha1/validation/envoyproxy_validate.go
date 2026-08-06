@@ -89,9 +89,8 @@ func validateProvider(spec *egv1a1.EnvoyProxySpec) []error {
 				errs = append(errs, validateServiceErrs...)
 			}
 		case egv1a1.EnvoyProxyProviderTypeHost:
-			if spec.Provider.Host == nil {
-				errs = append(errs, fmt.Errorf("field 'host' should be specified when provider type is 'Host'"))
-			}
+			// "host must be set when the provider type is 'Host'" is enforced by a
+			// CEL rule on the EnvoyProxyProvider CRD (see envoyproxy_types.go).
 		default:
 			errs = append(errs, fmt.Errorf("unsupported provider type %v", spec.Provider.Type))
 		}

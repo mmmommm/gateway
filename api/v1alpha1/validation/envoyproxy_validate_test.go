@@ -59,21 +59,9 @@ func TestValidateEnvoyProxy(t *testing.T) {
 			expected: false,
 		},
 		{
-			name: "nil custom provider",
-			proxy: &egv1a1.EnvoyProxy{
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: "test",
-					Name:      "test",
-				},
-				Spec: egv1a1.EnvoyProxySpec{
-					Provider: &egv1a1.EnvoyProxyProvider{
-						Type: egv1a1.EnvoyProxyProviderTypeHost,
-					},
-				},
-			},
-			expected: false,
-		},
-		{
+			// The "host required when type is Host" rule is now enforced by a CEL
+			// validation on the CRD (covered in test/cel-validation), so the Go
+			// validator no longer rejects a nil host here.
 			name: "valid custom provider",
 			proxy: &egv1a1.EnvoyProxy{
 				ObjectMeta: metav1.ObjectMeta{

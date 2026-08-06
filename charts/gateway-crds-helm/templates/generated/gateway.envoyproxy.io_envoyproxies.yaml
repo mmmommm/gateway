@@ -11274,6 +11274,9 @@ spec:
                 required:
                 - type
                 type: object
+                x-kubernetes-validations:
+                - message: host must be set when the provider type is 'Host'
+                  rule: self.type != 'Host' || has(self.host)
               routingType:
                 description: |-
                   RoutingType can be set to "Service" to use the Service Cluster IP for routing to the backend,

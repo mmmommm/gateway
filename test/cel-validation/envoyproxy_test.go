@@ -56,6 +56,29 @@ func TestEnvoyProxyProvider(t *testing.T) {
 			wantErrors: []string{"Unsupported value: \"foo\": supported values: \"Kubernetes\", \"Host\""},
 		},
 		{
+			desc: "host provider without host settings",
+			mutate: func(envoy *egv1a1.EnvoyProxy) {
+				envoy.Spec = egv1a1.EnvoyProxySpec{
+					Provider: &egv1a1.EnvoyProxyProvider{
+						Type: egv1a1.EnvoyProxyProviderTypeHost,
+					},
+				}
+			},
+			wantErrors: []string{"host must be set when the provider type is 'Host'"},
+		},
+		{
+			desc: "host provider with host settings",
+			mutate: func(envoy *egv1a1.EnvoyProxy) {
+				envoy.Spec = egv1a1.EnvoyProxySpec{
+					Provider: &egv1a1.EnvoyProxyProvider{
+						Type: egv1a1.EnvoyProxyProviderTypeHost,
+						Host: &egv1a1.EnvoyProxyHostProvider{},
+					},
+				}
+			},
+			wantErrors: []string{},
+		},
+		{
 			desc: "invalid service type",
 			mutate: func(envoy *egv1a1.EnvoyProxy) {
 				envoy.Spec = egv1a1.EnvoyProxySpec{
