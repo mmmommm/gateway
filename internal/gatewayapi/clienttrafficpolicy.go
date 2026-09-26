@@ -768,6 +768,7 @@ func (t *Translator) translateClientTrafficPolicyForListener(
 		httpIR.ProxyProtocol = proxyProtocol
 		httpIR.Timeout = timeout
 		httpIR.TLS = tlsConfig
+		httpIR.DetectMisdirectedRequests = detectMisdirectedRequests(policy.Spec.TLS)
 	}
 
 	if tcpIR != nil {
@@ -1045,6 +1046,13 @@ func translateSchemeHeaderTransform(scheme *egv1a1.SchemeHeaderTransform, httpIR
 	if *scheme == egv1a1.SchemeHeaderTransformMatchBackend {
 		httpIR.MatchBackendScheme = true
 	}
+}
+
+// detectMisdirectedRequests reports whether overlapping TLS listeners should keep HTTP/2 enabled and return
+// 421 Misdirected Request. An unset value is treated as DowngradeToHTTP1 here rather than through a CRD default,
+// so the default can be changed later without being persisted into existing objects.
+func detectMisdirectedRequests(tls *egv1a1.ClientTLSSettings) bool {
+	return tls != nil && tls.OverlappingTLSHandling == egv1a1.OverlappingTLSHandlingMisdirectedRequest
 }
 
 func (t *Translator) buildListenerTLSParameters(

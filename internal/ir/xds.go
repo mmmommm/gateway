@@ -299,9 +299,16 @@ type HTTPListener struct {
 	// Tls configuration. If omitted, the gateway will expose a plain text HTTP server.
 	TLS *TLSConfig `json:"tls,omitempty" yaml:"tls,omitempty"`
 	// TLSOverlaps indicates if the listener's certificate SANs overlap with another listener's certificate SANs.
-	// HTTP/2 should be disabled if this is true to avoid the HTTP/2 Connection Coalescing issue (see https://gateway-api.sigs.k8s.io/geps/gep-3567/)
+	// HTTP/2 should be disabled if this is true to avoid the HTTP/2 Connection Coalescing issue (see https://gateway-api.sigs.k8s.io/geps/gep-3567/),
+	// unless DetectMisdirectedRequests is enabled.
 	// We use a standalone field to avoid messing with the ClientTrafficPolicy ALPN config.
 	TLSOverlaps bool `json:"tlsOverlaps,omitempty" yaml:"tlsOverlaps,omitempty"`
+	// TLSOverlapsHostnames contains the hostnames of the other listeners whose certificate SANs overlap with this
+	// listener's certificate SANs. HTTP/2 requests for these hostnames may be coalesced onto this listener's connections.
+	TLSOverlapsHostnames []string `json:"tlsOverlapsHostnames,omitempty" yaml:"tlsOverlapsHostnames,omitempty"`
+	// DetectMisdirectedRequests keeps HTTP/2 enabled on a listener with overlapping TLS config, and returns
+	// 421 Misdirected Request for HTTP/2 requests whose authority matches one of the TLSOverlapsHostnames.
+	DetectMisdirectedRequests bool `json:"detectMisdirectedRequests,omitempty" yaml:"detectMisdirectedRequests,omitempty"`
 	// Routes associated with HTTP traffic to the service.
 	Routes []*HTTPRoute `json:"routes,omitempty" yaml:"routes,omitempty"`
 	// TCPKeepalive configuration for the listener

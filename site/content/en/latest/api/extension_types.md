@@ -942,6 +942,7 @@ _Appears in:_
 | `signatureAlgorithms` | _string array_ |  false  |  | SignatureAlgorithms specifies which signature algorithms the listener should<br />support. |
 | `alpnProtocols` | _[ALPNProtocol](#alpnprotocol) array_ |  false  |  | ALPNProtocols supplies the list of ALPN protocols that should be<br />exposed by the listener or used by the proxy to connect to the backend.<br />Defaults:<br />1. HTTPS Routes: h2 and http/1.1 are enabled in listener context.<br />2. Other Routes: ALPN is disabled.<br />3. Backends: proxy uses the appropriate ALPN options for the backend protocol.<br />When an empty list is provided, the ALPN TLS extension is disabled.<br />Defaults to [h2, http/1.1] if not specified.<br />Typical Supported values are:<br />- http/1.0<br />- http/1.1<br />- h2 |
 | `fingerprints` | _[TLSFingerprintType](#tlsfingerprinttype) array_ |  false  |  | Fingerprints specifies TLS client fingerprinting.<br />When specified, a JAX fingerprint derived from the client’s TLS handshake<br />is generated. The fingerprint can be logged in access logs or<br />forwarded to upstream services using request headers.<br />Fingerprinting is disabled if not specified.<br />Supported values are:<br />- JA3<br />- JA4 |
+| `overlappingTLSHandling` | _[OverlappingTLSHandling](#overlappingtlshandling)_ |  false  |  | OverlappingTLSHandling controls how overlapping TLS listeners handle HTTP/2<br />requests. MisdirectedRequest keeps HTTP/2 enabled and returns 421 Misdirected<br />Request when the request authority does not match the connection's SNI, as<br />described in [GEP-3567](https://gateway-api.sigs.k8s.io/geps/gep-3567/).<br />When unset or set to DowngradeToHTTP1, the existing ALPN downgrade is preserved<br />unless alpnProtocols is explicitly configured. |
 | `session` | _[Session](#session)_ |  false  |  | Session defines settings related to TLS session management. |
 
 
@@ -4462,6 +4463,21 @@ _Appears in:_
 | `oid` | _string_ |  true  |  | OID Value |
 | `type` | _[StringMatchType](#stringmatchtype)_ |  false  | Exact | Type specifies how to match against a string. |
 | `value` | _string_ |  true  |  | Value specifies the string value that the match must have. |
+
+
+#### OverlappingTLSHandling
+
+_Underlying type:_ _string_
+
+OverlappingTLSHandling controls how overlapping TLS listeners handle HTTP/2 requests.
+
+_Appears in:_
+- [ClientTLSSettings](#clienttlssettings)
+
+| Value | Description |
+| ----- | ----------- |
+| `DowngradeToHTTP1` | OverlappingTLSHandlingDowngradeToHTTP1 preserves the default ALPN downgrade.<br /> | 
+| `MisdirectedRequest` | OverlappingTLSHandlingMisdirectedRequest keeps HTTP/2 enabled and returns 421 when the<br />request authority does not match the SNI used for the connection.<br /> | 
 
 
 #### PassiveHealthCheck
